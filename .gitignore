@@ -1,0 +1,6 @@
+tmp/*
+projectFilesBackup/*
+*.gem
+Gemfile.lock
+pkg/*
+.idea/*

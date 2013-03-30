@@ -1,0 +1,35 @@
+=begin
+Bitcoin RPC Error Codes
+
+(-10, "Bitcoin is downloading blocks...");
+(-11, "Invalid account name");
+(-12, "Error: Keypool ran out, please call keypoolrefill first");
+(-12, "Error: Keypool ran out, please call topupkeypool first");
+(-13, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+(-14, "Error: The wallet passphrase entered was incorrect.");
+(-15, "Error: running with an encrypted wallet, but encryptwallet was called.");
+(-15, "Error: running with an unencrypted wallet, but walletlock was called.");
+(-15, "Error: running with an unencrypted wallet, but walletpassphrase was called.");
+(-15, "Error: running with an unencrypted wallet, but walletpassphrasechange was called.");
+(-16, "Error: Failed to encrypt the wallet.");
+(-17, "Error: Wallet is already unlocked.");
+(-2, string("Safe mode: ") + strWarning);
+(-3, "Invalid amount");
+(-32600, "Method must be a string");
+(-32600, "Missing method");
+(-32600, "Params must be an array");
+(-32601, "Method not found");
+(-32700, "Parse error");
+(-4, "Error refreshing keypool.");
+(-4, "Transaction commit failed");
+(-4, "Transaction creation failed");
+(-5, "Invalid bitcoin address");
+(-5, "Invalid or non-wallet transaction id");
+(-5, string("Invalid bitcoin address:")+s.name_);
+(-6, "Account has insufficient funds");
+(-6, "Insufficient funds");
+(-7, "Out of memory");
+(-8, "Invalid parameter");
+(-8, string("Invalid parameter, duplicated address: ")+s.name_);
+(-9, "Bitcoin is not connected!");
+=end
