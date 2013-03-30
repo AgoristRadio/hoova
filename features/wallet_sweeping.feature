@@ -16,7 +16,7 @@ Feature: Sweeping an Entire Wallet to another Bitcoin Address
     And a destination bitcoin address of "miA6bqrz9thieUpd5rZmHe1XpTmY6DLjot"
     When I sweep the wallet to the destination address
     Then the wallet balance should be 0
-    #And the destination address balance should be "99.9995"
+
 
 
 
