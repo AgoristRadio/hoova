@@ -1,10 +1,9 @@
-hoova
-=====
+# Hoova
 
-The Bitcoin Wallet Sweeper Agent
+## The Bitcoin Wallet Sweeper Agent
 
 ## Project Information Page
 [http://agoristradio.github.com/hoova/](http://agoristradio.github.com/hoova/)
 
-This project is in alpha development stage. It is not ready for use.
+#### Warning: This code is in alpha development stage. It is not ready for use. Especially with Real Money.
 
