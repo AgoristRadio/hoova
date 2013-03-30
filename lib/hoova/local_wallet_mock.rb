@@ -6,6 +6,10 @@ module Hoova
       @default_txfee = 0.0005
     end
 
+    def updated_balance_available?
+      balance_available?
+    end
+
     def balance
       @balance
     end
@@ -14,7 +18,7 @@ module Hoova
       @balance = balance.to_f # TODO look into better type f might not be best
     end
 
-    def send_balance_to(destination)
+    def sweep_to(destination)
       send_to_address(destination, balance_minus_fee)
       debit(@balance)
     end

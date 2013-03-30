@@ -1,10 +1,7 @@
 module Hoova
   class BitcoinWallet
     def initialize(username, password, host, port, ssl)
-
-      @bitcoind = Bitcoin::Client.new(username, password,
-                                      :host => host, :port => port, :ssl => ssl)
-
+      @bitcoind = Bitcoin::Client.new(username, password, :host => host, :port => port, :ssl => ssl)
       @default_txfee = 0.0005
       update_balance
     end
@@ -19,7 +16,8 @@ module Hoova
       @balance
     end
 
-    def send_balance_to(destination)
+    def sweep_to(destination)
+      force_txfee
       send_to_address(destination.address, balance_minus_fee)
       update_balance
     end
@@ -39,16 +37,24 @@ module Hoova
       @balance - @default_txfee
     end
 
+    def force_txfee(txfee=@default_txfee)
+      @bitcoind.settxfee(txfee)
+    end
+
     def send_to_address(address, amount)
       begin
+        puts 'Attempting to send #{amount} from balance of {@balance} to #{address}'
         @bitcoind.sendtoaddress(address, amount)
 
       rescue => e
         error = JSON.parse(e.response)['error']
+        puts "Error while trying to send #{amount} from balance of #{@balance} to #{address}"
         puts error
         case error['code']
           when -4  # Needs higher txfee
-            send_to_address(address, (@balance - extract_required_txfee(error['message']) + @default_txfee ))
+            required_txfee = extract_required_txfee(error['message'])
+
+            send_to_address(address, (@balance - required_txfee ))
           else
             puts "Unhandled error, document and implement."
         end
@@ -58,7 +64,9 @@ module Hoova
 
     def extract_required_txfee(message)
       #"Error: This transaction requires a transaction fee of at least 0.60 because of its amount, complexity, or use of recently received funds!"
-      message.match(/least (.*) because/)[1].to_f
+      required_txfee = message.match(/least (.*) because/)[1].to_f
+      puts "Detected required txfee request from wallet of #{required_txfee}"
+      required_txfee
     end
 
     def available_balance

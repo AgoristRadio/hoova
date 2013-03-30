@@ -1,14 +1,3 @@
-=begin
-# This will use the User class (Admin would have been guessed)
-FactoryGirl.define do
-  factory :TestnetWallet, class: Hoova::LocalWallet do
-    first_name "Admin"
-    last_name "User"
-    admin true
-  end
-end
-=end
-
 Given(/^A local testnet sweep wallet with a balance$/) do
   username = 'testnetu'
   password = 'testnetp'
@@ -23,7 +12,6 @@ Given(/^a destination bitcoin address of "(.*?)"$/) do |destination_address|
   @destination = Hoova::BitcoinAddress.new(destination_address)
 end
 
-
 Given(/^a local mock wallet with a balance of "(.*?)" and user "(.*?)" and pass "(.*?)"$/) do |balance, user, pass|
   @initial_wallet_balance = balance.to_f # TODO again better type cast than F?
   @wallet = Hoova::LocalWalletMock.new(user, pass)
@@ -36,7 +24,7 @@ Given(/^a destination bitcoin address of "(.*?)" with a balance of (\d+)$/) do |
 end
 
 When(/^I sweep the wallet to the destination address$/) do
-  Hoova::Sweeper.new(@wallet, @destination).sweep_forever
+  Hoova::Sweeper.new(@wallet, @destination).sweep_once
 end
 
 Then(/^the wallet balance should be (\d+)$/) do |desired_wallet_balance|

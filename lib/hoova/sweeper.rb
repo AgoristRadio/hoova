@@ -1,7 +1,7 @@
 module Hoova
   class Sweeper
-    def initialize(wallet, destination)
-      @wallet = wallet
+    def initialize(source, destination)
+      @source = source
       @destination = destination
       @sweep_poll_delay = 10
     end
@@ -14,11 +14,11 @@ module Hoova
     end
 
     def sweep_once
-      sweep if @wallet.updated_balance_available?
+      sweep if @source.updated_balance_available?
     end
 
     def sweep
-      @wallet.send_balance_to(@destination)
+      @source.sweep_to(@destination)
     end
 
   end
