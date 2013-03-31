@@ -11,7 +11,10 @@ module Hoova
     def update_balance
       acct = "*"
       minconf = 1
-      @balance = @bitcoind.getbalance(acct, minconf)
+      #minconf = 2
+      # 1 is faster but will cause problems if immature mined blocks
+      # 2 is a little slower, but will ignore immature mined blocks
+      @balance = @bitcoind.getbalance(acct, minconf) - 50 #hack to get around immature coins
     end
 
     def balance
@@ -47,18 +50,54 @@ module Hoova
     def send_to_address(address, amount)
       # TODO this is skanky ugly
       begin
-        puts 'Attempting to send #{amount} from balance of {@balance} to #{address}'
+        puts "Attempting to send #{amount} from balance of #{@balance} to #{address}"
         result = @bitcoind.sendtoaddress(address, amount)
 
       rescue => e
         error = JSON.parse(e.response)['error']
         puts "Error while trying to send #{amount} from balance of #{@balance} to #{address}"
         puts error
+        puts error['code'].inspect
         case error['code']
-          when -4  # Needs higher txfee
+          when -4 # Needs higher txfee
+            case error['message']
+              when 'Insufficient funds'
+                # this could be because of immature transactions
+                # Trap this like this:
+                # - list recent transactions
+                # - look for any transaction with category 'immature'
+                # "account" : "",
+                # "address" : "mqeyho5zKuSXsYnbbWWhPR3CdNxPWfkyx9",
+                # "category" : "immature",
+                # "amount" : 50.00000000,
+                # "confirmations" : 2,
+                # "generated" : true,
+                # "blockhash" : "0000000040af50fc5c4da6ac2bb44190a3655973e3b78716da43056d6dbc10cf",
+                # "blockindex" : 0,
+                # "blocktime" : 1364764219,
+                # "txid" : "45b83f0a71611fcc33c26ceb39d938d2ca208fdde885c78fde4fcd536c21cb2a",
+                # "time" : 1364764211,
+                # "timereceived" : 1364764211
+                #}
+                # - Get the amount
+                # - subtract amount from 'balance available to send'
+                # - send balance - transaction fee - these immature ones
+                # TODO - edge case since most people dont mine.
+                # I just ran into this on testnet
+                puts @bitcoind.getinfo
+
+                # CRITICAL TODO, everything is crapping out.
+                # HACK, until immature coins are 'good' hack balance to return - 50
+
+
+                result = send_to_address(address, (amount - @default_txfee) )
+                #return error['message']
+                return result
+            end
+
             required_txfee = extract_required_txfee(error['message'])
 
-            send_to_address(address, (@balance - required_txfee ))
+            result = send_to_address(address, (@balance - required_txfee))
           else
             result = "Unhandled error, document and implement."
             puts result

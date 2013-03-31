@@ -14,7 +14,12 @@ module Hoova
     end
 
     def sweep_once
-      sweep if @source.updated_balance_available?
+      if @source.updated_balance_available?
+        result = sweep
+        return "OK: #{result}"
+      else
+        return "OK: No balance detected."
+      end
     end
 
     def sweep
