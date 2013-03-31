@@ -20,8 +20,9 @@ module Hoova
 
     def sweep_to(destination)
       force_txfee
-      send_to_address(destination.address, balance_minus_fee)
+      result = send_to_address(destination.address, balance_minus_fee)
       update_balance
+      result
     end
 
     def updated_balance_available?
@@ -47,7 +48,7 @@ module Hoova
       # TODO this is skanky ugly
       begin
         puts 'Attempting to send #{amount} from balance of {@balance} to #{address}'
-        @bitcoind.sendtoaddress(address, amount)
+        result = @bitcoind.sendtoaddress(address, amount)
 
       rescue => e
         error = JSON.parse(e.response)['error']
@@ -59,10 +60,12 @@ module Hoova
 
             send_to_address(address, (@balance - required_txfee ))
           else
-            puts "Unhandled error, document and implement."
+            result = "Unhandled error, document and implement."
+            puts result
         end
 
       end
+      result
     end
 
     def extract_required_txfee(message)
