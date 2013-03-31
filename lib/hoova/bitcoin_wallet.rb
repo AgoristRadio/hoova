@@ -1,3 +1,5 @@
+# TODO Implement proper debugging output, kill puts
+
 module Hoova
   class BitcoinWallet
     def initialize(username, password, host, port, ssl)
@@ -42,6 +44,7 @@ module Hoova
     end
 
     def send_to_address(address, amount)
+      # TODO this is skanky ugly
       begin
         puts 'Attempting to send #{amount} from balance of {@balance} to #{address}'
         @bitcoind.sendtoaddress(address, amount)
@@ -63,6 +66,7 @@ module Hoova
     end
 
     def extract_required_txfee(message)
+      # TODO this is ugly
       #"Error: This transaction requires a transaction fee of at least 0.60 because of its amount, complexity, or use of recently received funds!"
       required_txfee = message.match(/least (.*) because/)[1].to_f
       puts "Detected required txfee request from wallet of #{required_txfee}"
