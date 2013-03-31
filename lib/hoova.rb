@@ -1,5 +1,5 @@
 
-require 'bitcoin-client'
+require 'bitcoin-client/lib/bitcoin-client'
 
 require "hoova/version"
 require "hoova/sweeper"
