@@ -11,9 +11,6 @@ module Hoova
     def update_balance
       acct = "*"
       minconf = 1
-      #minconf = 2
-      # 1 is faster but will cause problems if immature mined blocks
-      # 2 is a little slower, but will ignore immature mined blocks
       @balance = @bitcoind.getbalance(acct, minconf) - 50 #hack to get around immature coins
     end
 
