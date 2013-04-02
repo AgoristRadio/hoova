@@ -1,17 +1,39 @@
 # TODO Implement proper debugging output, kill puts
+class Unauthorized < StandardError;
+end
+class InvalidWallet < StandardError;
+end
+class ConnectionTimeout < StandardError;
+end
 
 module Hoova
   class BitcoinWallet
     def initialize(username, password, host, port, ssl)
       @bitcoind = Bitcoin::Client.new(username, password, :host => host, :port => port, :ssl => ssl)
       @default_txfee = 0.0005
-      update_balance
+
+      begin
+        update_balance
+
+      rescue Errno::ETIMEDOUT
+        raise ConnectionTimeout
+      rescue => e
+        if e.message.match(/401 Unauthorized/)
+          raise Unauthorized
+        elsif e.message.match(/wrong status line:/)
+          raise InvalidWallet
+        else
+          puts 'Unhandled exception...'
+          puts e.inspect
+          puts e.message
+        end
+      end
     end
 
     def update_balance
       acct = "*"
       minconf = 1
-      @balance = @bitcoind.getbalance(acct, minconf) - 50 #hack to get around immature coins
+      @balance = @bitcoind.getbalance(acct, minconf)
     end
 
     def balance
@@ -41,7 +63,7 @@ module Hoova
     end
 
     def force_txfee(txfee=@default_txfee)
-      @bitcoind.settxfee(txfee)
+      @bitcoind.settxfee txfee
     end
 
     def send_to_address(address, amount)
@@ -49,6 +71,9 @@ module Hoova
       begin
         puts "Attempting to send #{amount} from balance of #{@balance} to #{address}"
         result = @bitcoind.sendtoaddress(address, amount)
+        if result.size == 64 # Transaction Size in Characters
+          result = "Swept #{amount} from balance of #{@balance}"
+        end
 
       rescue => e
         error = JSON.parse(e.response)['error']
@@ -87,7 +112,7 @@ module Hoova
                 # HACK, until immature coins are 'good' hack balance to return - 50
 
 
-                result = send_to_address(address, (amount - @default_txfee) )
+                result = send_to_address(address, (amount - @default_txfee))
                 #return error['message']
                 return result
             end
